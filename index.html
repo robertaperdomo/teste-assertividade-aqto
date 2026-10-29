@@ -1,289 +1,299 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste de Comunicação Assertiva</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- html2pdf.js CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
-        }
-        /* Custom styling for printable area */
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste de Comunicação Assertiva - Aqto</title>
+  <!-- Chart.js para o Gráfico Radar -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- html2pdf.js para Exportação em PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --secondary: #3b82f6;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    }
+    h1 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    p.instruction {
+      font-size: 0.95rem;
+      color: #64748b;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+    .question-card {
+      background: #f1f5f9;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .question-text {
+      font-weight: 500;
+    }
+    .options {
+      display: flex;
+      justify-content: space-between;
+      gap: 5px;
+    }
+    .option-btn {
+      flex: 1;
+      padding: 8px 0;
+      border: 1px solid #cbd5e1;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .option-btn:hover {
+      background: var(--secondary);
+      color: white;
+      border-color: var(--secondary);
+    }
+    .option-btn.selected {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .submit-btn, .pdf-btn {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.2s;
+    }
+    .submit-btn:hover, .pdf-btn:hover {
+      background-color: var(--secondary);
+    }
+    #result-section {
+      display: none;
+      margin-top: 30px;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+    .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 450px;
+      margin: 0 auto 20px auto;
+    }
+    .score-summary {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .score-card {
+      padding: 15px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border-left: 4px solid var(--primary);
+    }
+    .score-card h4 {
+      margin: 0 0 5px 0;
+      color: var(--primary);
+    }
+    .score-card p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+  </style>
 </head>
-<body class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+<body>
 
-    <div class="max-w-3xl mx-auto space-y-8" id="content-to-export">
-        
-        <!-- Header -->
-        <header class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500"></div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 tracking-tight">O Quanto Você é Assertivo?</h1>
-            <p class="mt-2 text-sm sm:text-base text-slate-600 max-w-xl mx-auto">
-                Avalie o seu estilo dominante de comunicação respondendo às 15 questões abaixo.
-            </p>
-            <div class="mt-4 inline-flex items-center px-4 py-2 bg-slate-100 rounded-full text-xs font-medium text-slate-600">
-                Escala: 0 (Nunca / Diferente de mim) a 5 (Sempre / Exatamente como eu)
-            </div>
-        </header>
+<div class="container" id="quiz-container">
+  <h1>Teste de Comunicação Assertiva</h1>
+  <p class="instruction">
+    Dê uma nota a você mesmo de 0 a 5 para cada afirmação, em que <b>0 = nunca / muito diferente de mim</b> e <b>5 = sempre / exatamente como eu</b>.
+  </p>
 
-        <!-- Form Questions -->
-        <form id="assertiveForm" class="space-y-4">
-            <div id="questionsContainer" class="space-y-4">
-                <!-- Questions injected dynamically by JS -->
-            </div>
+  <form id="assertiveness-form">
+    <div id="questions-wrapper"></div>
+    <button type="button" class="submit-btn" onclick="calculateResults()">Ver Resultado</button>
+  </form>
 
-            <!-- Action Buttons -->
-            <div class="pt-6 no-print flex flex-col sm:flex-row gap-4 justify-center">
-                <button type="button" id="calculateBtn" onclick="calculateResults()" 
-                    class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-100 transition duration-200 ease-in-out flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-chart-pie"></i> Ver Resultado do Teste
-                </button>
-            </div>
-        </form>
+  <div id="result-section">
+    <div id="pdf-content">
+      <h2 style="text-align: center; color: #1e3a8a; margin-bottom: 5px;">Relatório de Comunicação Assertiva</h2>
+      <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 20px;">Resultado do Perfil Comportamental</p>
+      
+      <div class="chart-container">
+        <canvas id="radarChart"></canvas>
+      </div>
 
-        <!-- Error Message Container -->
-        <div id="errorMessage" class="hidden bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl text-sm text-center">
-            <i class="fa-solid fa-circle-exclamation mr-1"></i> Por favor, responda a todas as 15 perguntas para gerar o seu perfil.
+      <div class="score-summary">
+        <div class="score-card">
+          <h4>Perfil Passivo</h4>
+          <p>Pontuação: <strong id="score-passivo">0</strong> / 25</p>
         </div>
-
-        <!-- Results Section (Initially Hidden) -->
-        <section id="resultsSection" class="hidden space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
-                <div class="text-center mb-6">
-                    <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Seu Gráfico de Comunicação</h2>
-                    <p class="text-sm text-slate-500">Sua distribuição de pontuação nos 3 perfis analisados</p>
-                </div>
-
-                <!-- Radar Chart Canvas -->
-                <div class="relative w-full max-w-md mx-auto aspect-square">
-                    <canvas id="radarChart"></canvas>
-                </div>
-
-                <!-- Score Cards Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-                        <span class="block text-xs font-semibold uppercase tracking-wider text-amber-700">Passivo</span>
-                        <span id="scorePassivo" class="text-2xl sm:text-3xl font-bold text-amber-900 my-1 block">0 / 25</span>
-                        <p class="text-xs text-amber-800/80">Tendência a evitar confrontos e conter expressividade.</p>
-                    </div>
-
-                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
-                        <span class="block text-xs font-semibold uppercase tracking-wider text-emerald-700">Assertivo</span>
-                        <span id="scoreAssertivo" class="text-2xl sm:text-3xl font-bold text-emerald-900 my-1 block">0 / 25</span>
-                        <p class="text-xs text-emerald-800/80">Comunicação clara, transparente e respeitosa.</p>
-                    </div>
-
-                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 text-center">
-                        <span class="block text-xs font-semibold uppercase tracking-wider text-rose-700">Agressivo</span>
-                        <span id="scoreAgressivo" class="text-2xl sm:text-3xl font-bold text-rose-900 my-1 block">0 / 25</span>
-                        <p class="text-xs text-rose-800/80">Tendência ao confronto e imposição de vontades.</p>
-                    </div>
-                </div>
-
-                <!-- PDF Export Action -->
-                <div class="mt-8 pt-6 border-t border-slate-100 flex justify-center no-print">
-                    <button type="button" onclick="exportToPDF()" 
-                        class="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-xl shadow transition duration-200 flex items-center gap-2 text-sm">
-                        <i class="fa-solid fa-file-pdf"></i> Baixar Relatório em PDF
-                    </button>
-                </div>
-            </div>
-        </section>
-
+        <div class="score-card">
+          <h4>Perfil Assertivo</h4>
+          <p>Pontuação: <strong id="score-assertivo">0</strong> / 25</p>
+        </div>
+        <div class="score-card">
+          <h4>Perfil Agressivo</h4>
+          <p>Pontuação: <strong id="score-agressivo">0</strong> / 25</p>
+        </div>
+      </div>
     </div>
 
-    <!-- JavaScript Application Logic -->
-    <script>
-        // Array of 15 questions
-        const questions = [
-            "Quando enfrento alguém sobre determinado problema sinto-me bastante constrangido.",
-            "Permaneço calmo e confiante ao defrontar-me com sarcasmo, escárnio ou críticas ofensivas.",
-            "Perco a calma facilmente.",
-            "Procuro resolver os problemas diretamente, sem culpar ou julgar os outros.",
-            "Acho certo pedir o que desejo ou expor meus sentimentos.",
-            "Sinto-me à vontade quanto ao grau de contato visual que estabeleço com outras pessoas e creio que elas também sentem o mesmo.",
-            "Sinto-me facilmente constrangido pelo ridículo ou sarcasmo.",
-            "É mais importante obter o que desejo do que conquistar a simpatia das pessoas.",
-            "Prefiro mil vezes quando as pessoas adivinham meus desejos do que ter de dizer-lhes.",
-            "Confio em minha habilidade de resolver satisfatoriamente a maioria das situações de trabalho que envolvem confronto com outras pessoas.",
-            "Elevarei o tom da voz ou usarei de olhares ofensivos ou sarcasmo para conseguir o que desejo.",
-            "Paciência não é meu forte.",
-            "Conquistar a simpatia das pessoas é o mais importante para mim ainda que algumas vezes precise, para isto, 'comprar' sua colaboração.",
-            "Detesto confrontos e farei tudo que estiver ao meu alcance para evitá-los.",
-            "É fácil, para mim, agredir ou apontar o dedo indicador para as outras pessoas."
-        ];
+    <button type="button" class="pdf-btn" onclick="downloadPDF()">Baixar Relatório em PDF</button>
+  </div>
+</div>
 
-        // Mappings according to specific prompt rules (1-indexed item numbers mapped to 0-indexed array indices)
-        const profileIndices = {
-            passivo: [0, 6, 8, 12, 13],    // Items 1, 7, 9, 13, 14
-            assertivo: [1, 3, 4, 5, 9],    // Items 2, 4, 5, 6, 10
-            agressivo: [2, 7, 10, 11, 14]   // Items 3, 8, 11, 12, 15
-        };
+<script>
+  const questions = [
+    { id: 1, text: "Quando enfrento alguém sobre determinado problema sinto-me bastante constrangido.", type: "passivo" },
+    { id: 2, text: "Permaneço calmo e confiante ao defrontar-me com sarcasmo, escárnio ou críticas ofensivas.", type: "assertivo" },
+    { id: 3, text: "Perco a calma facilmente.", type: "agressivo" },
+    { id: 4, text: "Procuro resolver os problemas diretamente, sem culpar ou julgar os outros.", type: "assertivo" },
+    { id: 5, text: "Acho certo pedir o que desejo ou expor meus sentimentos.", type: "assertivo" },
+    { id: 6, text: "Sinto-me à vontade quanto ao grau de contato visual que estabeleço com outras pessoas e creio que elas também sentem o mesmo.", type: "assertivo" },
+    { id: 7, text: "Sinto-me facilmente constrangido pelo ridículo ou sarcasmo.", type: "passivo" },
+    { id: 8, text: "É mais importante obter o que desejo do que conquistar a simpatia das pessoas.", type: "agressivo" },
+    { id: 9, text: "Prefiro mil vezes quando as pessoas adivinham meus desejos do que ter de dizer-lhes.", type: "passivo" },
+    { id: 10, text: "Confio em minha habilidade de resolver satisfatoriamente a maioria das situações de trabalho que envolvem confronto com outras pessoas.", type: "assertivo" },
+    { id: 11, text: "Elevarei o tom da voz ou usarei de olhares ofensivos ou sarcasmo para conseguir o que desejo.", type: "agressivo" },
+    { id: 12, text: "Paciência não é meu forte.", type: "agressivo" },
+    { id: 13, text: "Conquistar a simpatia das pessoas é o mais importante para mim ainda que algumas vezes precise, para isto, 'comprar' sua colaboração.", type: "passivo" },
+    { id: 14, text: "Detesto confrontos e farei tudo que estiver ao meu alcance para evitá-los.", type: "passivo" },
+    { id: 15, text: "É fácil, para mim, agredir ou apontar o dedo indicador para as outras pessoas.", type: "agressivo" }
+  ];
 
-        let radarChartInstance = null;
+  const answers = {};
+  let radarChartInstance = null;
 
-        // Render questions on page load
-        window.onload = function () {
-            const container = document.getElementById('questionsContainer');
-            
-            questions.forEach((qText, index) => {
-                const questionNum = index + 1;
-                const card = document.createElement('div');
-                card.className = "bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition hover:border-slate-300";
-                
-                card.innerHTML = `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <p class="text-slate-800 text-sm sm:text-base font-medium flex-1">
-                            <span class="inline-block w-6 font-bold text-indigo-600">${questionNum}.</span> ${qText}
-                        </p>
-                        <div class="flex items-center gap-1 sm:gap-2 justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100">
-                            ${[0, 1, 2, 3, 4, 5].map(val => `
-                                <label class="flex flex-col items-center cursor-pointer group">
-                                    <input type="radio" name="q${questionNum}" value="${val}" class="peer sr-only" required>
-                                    <span class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 group-hover:bg-indigo-50 transition">
-                                        ${val}
-                                    </span>
-                                </label>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        };
+  // Renderizar questões
+  const wrapper = document.getElementById('questions-wrapper');
+  questions.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.innerHTML = `
+      <div class="question-text">${q.id}. ${q.text}</div>
+      <div class="options">
+        ${[0, 1, 2, 3, 4, 5].map(val => `
+          <button type="button" class="option-btn" onclick="selectOption(${q.id}, ${val}, this)">${val}</button>
+        `).join('')}
+      </div>
+    `;
+    wrapper.appendChild(card);
+  });
 
-        // Calculation Logic
-        function calculateResults() {
-            const errorMsg = document.getElementById('errorMessage');
-            errorMsg.classList.add('hidden');
+  function selectOption(qId, val, btn) {
+    answers[qId] = val;
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
 
-            const scores = new Array(15).fill(null);
+  function calculateResults() {
+    if (Object.keys(answers).length < questions.length) {
+      alert("Por favor, responda a todas as 15 perguntas antes de ver o resultado.");
+      return;
+    }
 
-            // Read values
-            for (let i = 1; i <= 15; i++) {
-                const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
-                if (!selectedOption) {
-                    errorMsg.classList.remove('hidden');
-                    errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    return;
-                }
-                scores[i - 1] = parseInt(selectedOption.value, 10);
-            }
+    let passivo = 0, assertivo = 0, agressivo = 0;
 
-            // Sum per category
-            const sumScores = (indices) => indices.reduce((acc, idx) => acc + scores[idx], 0);
+    questions.forEach(q => {
+      const score = answers[q.id] || 0;
+      if (q.type === 'passivo') passivo += score;
+      if (q.type === 'assertivo') assertivo += score;
+      if (q.type === 'agressivo') agressivo += score;
+    });
 
-            const scorePassivo = sumScores(profileIndices.passivo);
-            const scoreAssertivo = sumScores(profileIndices.assertivo);
-            const scoreAgressivo = sumScores(profileIndices.agressivo);
+    document.getElementById('score-passivo').innerText = passivo;
+    document.getElementById('score-assertivo').innerText = assertivo;
+    document.getElementById('score-agressivo').innerText = agressivo;
 
-            // Update DOM scores
-            document.getElementById('scorePassivo').innerText = `${scorePassivo} / 25`;
-            document.getElementById('scoreAssertivo').innerText = `${scoreAssertivo} / 25`;
-            document.getElementById('scoreAgressivo').innerText = `${scoreAgressivo} / 25`;
+    document.getElementById('result-section').style.display = 'block';
 
-            // Display Results Section
-            const resultsSection = document.getElementById('resultsSection');
-            resultsSection.classList.remove('hidden');
+    renderChart(passivo, assertivo, agressivo);
 
-            // Render/Update Chart
-            renderChart(scorePassivo, scoreAssertivo, scoreAgressivo);
+    document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+  }
 
-            // Smooth scroll to results
-            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function renderChart(passivo, assertivo, agressivo) {
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    
+    if (radarChartInstance) {
+      radarChartInstance.destroy();
+    }
+
+    radarChartInstance = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Passivo', 'Assertivo', 'Agressivo'],
+        datasets: [{
+          label: 'Pontuação',
+          data: [passivo, assertivo, agressivo],
+          backgroundColor: 'rgba(59, 130, 246, 0.2)',
+          borderColor: '#1e3a8a',
+          borderWidth: 2,
+          pointBackgroundColor: '#1e3a8a'
+        }]
+      },
+      options: {
+        animation: false, // Desativa animação para garantir captura no PDF
+        scales: {
+          r: {
+            min: 0,
+            max: 25,
+            ticks: { stepSize: 5 }
+          }
         }
+      }
+    });
+  }
 
-        // Render Chart.js Radar
-        function renderChart(passivo, assertivo, agressivo) {
-            const ctx = document.getElementById('radarChart').getContext('2d');
+  function downloadPDF() {
+    const element = document.getElementById('pdf-content');
+    
+    const opt = {
+      margin:       15,
+      filename:     'Relatorio_Comunicacao_Assertiva.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
 
-            if (radarChartInstance) {
-                radarChartInstance.destroy();
-            }
+    html2pdf().set(opt).from(element).save();
+  }
+</script>
 
-            radarChartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Passivo', 'Assertivo', 'Agressivo'],
-                    datasets: [{
-                        label: 'Pontuação do Perfil',
-                        data: [passivo, assertivo, agressivo],
-                        backgroundColor: 'rgba(99, 102, 241, 0.25)',
-                        borderColor: 'rgba(99, 102, 241, 1)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'rgba(99, 102, 241, 1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(99, 102, 241, 1)',
-                        pointRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        r: {
-                            angleLines: { color: '#e2e8f0' },
-                            grid: { color: '#f1f5f9' },
-                            pointLabels: {
-                                font: { family: 'Inter', size: 13, weight: '600' },
-                                color: '#334155'
-                            },
-                            ticks: {
-                                stepSize: 5,
-                                backdropColor: 'transparent',
-                                font: { family: 'Inter', size: 10 }
-                            },
-                            suggestedMin: 0,
-                            suggestedMax: 25
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-
-        // Export PDF Logic
-        function exportToPDF() {
-            const element = document.getElementById('content-to-export');
-            const noPrintElements = document.querySelectorAll('.no-print');
-            
-            // Temporarily hide actions for cleaner PDF
-            noPrintElements.forEach(el => el.style.display = 'none');
-
-            const opt = {
-                margin:       0.4,
-                filename:     'resultado-teste-assertividade.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Restore buttons
-                noPrintElements.forEach(el => el.style.display = '');
-            });
-        }
-    </script>
 </body>
 </html>
